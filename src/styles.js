@@ -50,6 +50,9 @@ export const useStyles = makeStyles((theme) => ({
   },
   noItems: {
     marginTop: 50,
+  },
+  center: {
+    marginLeft: "calc(50% - 20px)",
   }
 }));
 

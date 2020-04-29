@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {useSelector} from 'react-redux';
 import {
   CssBaseline,
   AppBar,
@@ -7,10 +6,12 @@ import {
   Toolbar,
   Paper,
   Typography,
+  CircularProgress
 } from '@material-ui/core';
 
 import {addItem, deleteItem} from "./store/items/actions";
-
+import { useAsync } from "./api/axios";
+import { getPosts } from './api/items';
 import {Copyright, Alert} from "./ui";
 import {Form} from "./components/Form";
 import {Item} from "./components/Item";
@@ -19,8 +20,7 @@ import {useStyles} from './styles';
 
 function App() {
   const [alert, setAlert] = useState({open: false, type: '', message: ''});
-  const items = useSelector(store => store.item.items);
-
+  const { pending: isLoading, value: items } = useAsync(getPosts, true);
   const classes = useStyles();
 
   return (
@@ -47,7 +47,10 @@ function App() {
         </Typography>
         <Grid className={classes.items} container spacing={2} direction="row"
               justify="flex-start">
-          {items.map((item, index) => (
+          {isLoading &&
+            (<CircularProgress className={classes.center}/>)
+          }
+          {items && items.map((item, index) => (
             <Item
               key={index}
               index={index}
@@ -56,10 +59,10 @@ function App() {
             />
           ))}
         </Grid>
-          {!items.length && (
-            <Typography className={classes.noItems} component="h4" variant="h6" align="center">
-              No items.
-            </Typography>
+          {items && !items.length && (
+              <Typography className={classes.noItems} component="h4" variant="h6" align="center">
+                No items.
+              </Typography>
           )}
         <Alert alert={alert} setAlert={setAlert}/>
       </div>
