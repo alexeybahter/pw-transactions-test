@@ -1,12 +1,12 @@
 const envType = process.env.NODE_ENV || 'development';
 const config = {
   development: {
-    currentAddress: 'https://jsonplaceholder.typicode.com/',
-    serverAddress: 'https://jsonplaceholder.typicode.com/'
+    currentAddress: 'http://localhost:6800/api/',
+    serverAddress: 'http://localhost:6800/api/'
   },
   production: {
-    currentAddress: 'https://jsonplaceholder.typicode.com/',
-    serverAddress: 'https://jsonplaceholder.typicode.com/'
+    currentAddress: '',
+    serverAddress: ''
   }
 };
 

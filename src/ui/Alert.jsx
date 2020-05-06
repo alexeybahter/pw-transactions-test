@@ -1,8 +1,8 @@
 import React from "react";
-import AlertUI from "@material-ui/lab/Alert";
-import {Snackbar} from "@material-ui/core";
+import { Alert as AlertUI } from "@material-ui/lab";
+import { Snackbar } from "@material-ui/core";
 
-export function Alert({alert,setAlert, ...props}) {
+export const Alert = ({ alert, setAlert, ...props}) => {
   return (
     <Snackbar
       open={alert.open}

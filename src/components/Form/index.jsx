@@ -1,84 +1,83 @@
-import React, { useState} from "react";
-import {useDispatch} from "react-redux";
+import React, { useState } from "react";
 import {
   Grid,
-  TextField,
-  Button
+  Button,
+  CircularProgress,
+  Paper,
+  Typography
 } from '@material-ui/core';
 
-import {useStyles} from './styles';
+import { Autocomplete, InputNumber } from '../../ui';
 
-export const Form = ({ addItem, showAlert }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [action, setAction] = useState('');
+import { useStyles } from './styles';
 
-  const dispatch = useDispatch();
+export const Form = ({ handleSubmitRequest, showAlert, userList }) => {
+  const [clientName, setClientName] = useState(null);
+  const [quantity, setQuantity] = useState({number: '',});
 
   const classes = useStyles();
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    dispatch(addItem({ name, description, action}));
 
-    setName('');
-    setDescription('');
-    setAction('');
+    const {data: { transaction, errors }} = await handleSubmitRequest({recipient_id: clientName.id, quantity: Number(quantity.number)})
 
-    showAlert({type: 'success', message: 'Item created!'})
+    if (transaction) {
+      setClientName({name: ''});
+      setQuantity({number: ''});
+
+      showAlert( (alert) => ({...alert, type: 'success', message: "Transaction created!", open: true}));
+    }
+
+    errors && showAlert( (alert) => ({...alert, type: 'error', message: errors[0].msg, open: true}));
   };
 
   return (
     <>
-      <form onSubmit={onSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={9}>
-            <TextField
-              required
-              id="name"
-              name="name"
-              label="Name"
-              fullWidth
-              value={name}
-              onInput={e=>setName(e.target.value)}
-              autoComplete="name"
-            />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <TextField
-              required
-              id="action"
-              name="action"
-              label="Action"
-              value={action}
-              onChange={e=>setAction(e.target.value)}
-              fullWidth
-              autoComplete="action"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              id="description"
-              name="description"
-              label="Description"
-              value={description}
-              onInput={e=>setDescription(e.target.value)}
-              fullWidth
-              autoComplete="description"
-            />
-          </Grid>
-          <Grid container item justify="flex-end">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              className={classes.button}>
-              Create
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
+      <main className={classes.layout}>
+        <Paper className={classes.paper}>
+          <Typography className={classes.title} component="h1" variant="h4" align="center">
+            Create Transaction
+          </Typography>
+          {userList === null ?
+            <CircularProgress className={classes.center}/>
+            :
+            <form onSubmit={onSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={12}>
+                  <Autocomplete
+                    value={clientName}
+                    setValue={setClientName}
+                    options={userList.users}
+                    keyName="name"
+                    label={"Client Name"}
+                    id="client-name-options"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <InputNumber
+                    label="Quantity"
+                    value={quantity}
+                    setValue={setQuantity}
+                    name="number"
+                    variant="outlined"
+                    id="formatted-quantity-input"
+                  />
+                </Grid>
+                <Grid container item justify="flex-end">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    className={classes.button}>
+                    Create
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          }
+        </Paper>
+      </main>
     </>
   )
 };

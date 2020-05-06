@@ -13,14 +13,6 @@ const getInitialStore = () => ({
       name: "Test Name 2",
       action: "action",
       description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-    },{
-      name: "Test Name 3",
-      action: "action",
-      description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-    },{
-      name: "Test Name 4",
-      action: "action",
-      description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
     },
   ]
 });
