@@ -17,8 +17,6 @@ import { getComparator, stableSort } from "../../utils";
 
 import { useStyles } from './styles';
 
-const rows = [ ];
-
 export const EnhancedTable = ({data, getDataRequest, headCells}) => {
   const classes = useStyles();
   const [order, setOrder] = React.useState('desc');
@@ -26,19 +24,44 @@ export const EnhancedTable = ({data, getDataRequest, headCells}) => {
   const [tableData, setTableData] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [total, setTotal] = React.useState(5);
-  const [emptyRows, setEmptyRows] = useState(0)
+  const [total, setTotal] = React.useState(0);
+  const [emptyRows, setEmptyRows] = useState(0);
 
   useEffect(() => {
     if (data) {
-      // Material UI first page is 0
-      const firstPage = data.pagination.page - 1;
+      const {
+        transactions,
+        pagination: {
+          page: currentPage,
+          per_page,
+          total: countAllItems
+        }
+      } = data;
 
-      setTableData(data.transactions);
+
+      // Material UI first page is 0
+      const firstPage = currentPage - 1;
+      const fiveRows = 5;
+      const lastPage = Math.ceil(countAllItems/rowsPerPage);
+
+      setTableData(transactions);
       setPage(firstPage);
-      setRowsPerPage(data.pagination.per_page)
-      setTotal(data.pagination.total)
-      setEmptyRows(rowsPerPage - Math.min(rowsPerPage, total - page * rowsPerPage));
+      setRowsPerPage(per_page);
+      setTotal(countAllItems);
+
+      if (lastPage !== currentPage) {
+        if (countAllItems === 0) {
+          setEmptyRows(5);
+        } else {
+          setEmptyRows(0)
+        }
+      } else if (lastPage === currentPage) {
+        if (countAllItems % fiveRows || countAllItems === 0) {
+          setEmptyRows(rowsPerPage-(countAllItems % rowsPerPage));
+        } else {
+          setEmptyRows( countAllItems % rowsPerPage);
+        }
+      }
     }
   },[ data, page ]);
 
@@ -86,12 +109,11 @@ export const EnhancedTable = ({data, getDataRequest, headCells}) => {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              rowCount={rows.length}
+              rowCount={0}
             />
-            <TableBody className={classes.tableBody}>
+            <TableBody>
               {!tableData ?
                 (<TableRow
-                    className={classes.emptyBody}
                     style={{ height: 265 }}>
                     <TableCell colSpan={12} align="center">
                       <CircularProgress className={classes.center}/>
@@ -122,7 +144,9 @@ export const EnhancedTable = ({data, getDataRequest, headCells}) => {
               }
               {emptyRows > 0 && (
                 <TableRow style={{ height: (53) * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={6} align="center">
+                    {total === 0 && 'You have no history.' }
+                  </TableCell>
                 </TableRow>
               )}
             </TableBody>
